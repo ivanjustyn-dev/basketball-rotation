@@ -8,9 +8,9 @@ import { RestingSection } from "./components/RestingSection";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-950">
+    <div className="min-h-screen w-full overflow-x-hidden bg-slate-100 text-slate-950">
       <AppHeader />
-      <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-4 pb-10">
+      <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-4 pb-10">
         <PrimaryActions />
         <CourtSection />
         <QueueSection />

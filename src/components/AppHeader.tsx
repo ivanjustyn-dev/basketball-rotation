@@ -18,9 +18,9 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-black tracking-normal text-slate-950">
+      <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-black tracking-normal text-slate-950 sm:text-xl">
             Basketball Rotation
           </h1>
           <p className="text-xs font-medium text-slate-500">Pickup game queue</p>

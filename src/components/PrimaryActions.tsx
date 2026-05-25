@@ -33,9 +33,9 @@ export function PrimaryActions() {
   }
 
   return (
-    <section className="grid grid-cols-2 gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:grid-cols-4">
+    <section className="grid gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:grid-cols-4">
       <Button
-        className="col-span-2 sm:col-span-1"
+        className="w-full sm:col-span-1"
         disabled={queueLength === 0}
         icon={<UsersRound size={18} />}
         onClick={handleFill}
@@ -45,6 +45,7 @@ export function PrimaryActions() {
         Fill Empty Slots
       </Button>
       <Button
+        className="w-full"
         disabled={!winnerReady}
         icon={<Trophy size={18} />}
         onClick={() => handleWinner("teamA")}
@@ -54,6 +55,7 @@ export function PrimaryActions() {
         Team A Won
       </Button>
       <Button
+        className="w-full"
         disabled={!winnerReady}
         icon={<Trophy size={18} />}
         onClick={() => handleWinner("teamB")}
@@ -63,6 +65,7 @@ export function PrimaryActions() {
         Team B Won
       </Button>
       <Button
+        className="w-full"
         disabled={!undoSnapshot}
         icon={<RotateCcw size={18} />}
         onClick={handleUndo}

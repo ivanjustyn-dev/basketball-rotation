@@ -70,12 +70,12 @@ export function RegisteredPlayersSection() {
 
   return (
     <section>
-      <div className="mb-3 flex items-end justify-between gap-3">
+      <div className="mb-3 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end">
         <div>
           <h2 className="text-lg font-black text-slate-950">Registered Players</h2>
           <p className="text-sm text-slate-500">Saved locally on this device.</p>
         </div>
-        <div className="flex shrink-0 gap-2">
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:shrink-0">
           <Button
             disabled={eligibleCheckInCount === 0}
             icon={<UsersRound size={18} />}
