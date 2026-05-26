@@ -16,6 +16,7 @@ import {
   renameRegisteredPlayer,
   returnRestingPlayerToQueue,
   startNewGameDay,
+  swapCourtPlayers,
   undoLastResult,
 } from "./rotation";
 import type { AppState, Player } from "../types";
@@ -172,6 +173,34 @@ describe("rotation rules", () => {
     expect(state.court.teamA[0]).toBeNull();
     expect(state.restingPlayers).toEqual(["1"]);
     expect(namesFor(state, state.queue)).toEqual(["C", "K"]);
+  });
+
+  it("swaps two occupied court slots without changing queue or win streaks", () => {
+    let state = checkInAll(withPlayers(["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]));
+    state = fillEmptySlots(state);
+    state = {
+      ...state,
+      sessionPlayers: { ...state.sessionPlayers, "1": { consecutiveWins: 1 as const } },
+    };
+
+    state = swapCourtPlayers(state, "teamA", 0, "teamB", 1);
+
+    expect(namesFor(state, state.court.teamA.filter(Boolean) as string[])).toEqual([
+      "G",
+      "B",
+      "C",
+      "D",
+      "E",
+    ]);
+    expect(namesFor(state, state.court.teamB.filter(Boolean) as string[])).toEqual([
+      "F",
+      "A",
+      "H",
+      "I",
+      "J",
+    ]);
+    expect(namesFor(state, state.queue)).toEqual(["K"]);
+    expect(state.sessionPlayers["1"].consecutiveWins).toBe(1);
   });
 
   it("renames, deletes, and starts a new game day cleanly", () => {

@@ -1,6 +1,7 @@
-import { LogOut, UsersRound } from "lucide-react";
+import { ArrowLeftRight, LogOut, UsersRound, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { cn } from "../lib/utils";
 import { COURT_SIZE, getPlayerName, getWins } from "../lib/rotation";
 import { useAppStore } from "../store/useAppStore";
 import type { PlayerId, TeamKey } from "../types";
@@ -21,11 +22,13 @@ const teamLabels: Record<TeamKey, string> = {
 
 export function CourtSection() {
   const [selected, setSelected] = useState<SelectedCourtPlayer | null>(null);
+  const [swapSource, setSwapSource] = useState<SelectedCourtPlayer | null>(null);
   const court = useAppStore((state) => state.court);
   const players = useAppStore((state) => state.registeredPlayers);
   const getState = useAppStore();
   const moveCourtPlayerToQueue = useAppStore((state) => state.moveCourtPlayerToQueue);
   const moveCourtPlayerToRest = useAppStore((state) => state.moveCourtPlayerToRest);
+  const swapCourtPlayers = useAppStore((state) => state.swapCourtPlayers);
 
   function handleMoveToQueue() {
     if (!selected) return;
@@ -39,6 +42,45 @@ export function CourtSection() {
     moveCourtPlayerToRest(selected.team, selected.slotIndex);
     setSelected(null);
     toast.success("Player moved to Resting / Out");
+  }
+
+  function isSameCourtPlayer(
+    first: SelectedCourtPlayer,
+    second: SelectedCourtPlayer,
+  ) {
+    return first.team === second.team && first.slotIndex === second.slotIndex;
+  }
+
+  function handleCourtPlayerClick(target: SelectedCourtPlayer) {
+    if (!swapSource) {
+      setSelected(target);
+      return;
+    }
+
+    if (isSameCourtPlayer(swapSource, target)) {
+      setSwapSource(null);
+      toast.message("Swap canceled");
+      return;
+    }
+
+    const sourceName = getPlayerName(players, swapSource.playerId);
+    const targetName = getPlayerName(players, target.playerId);
+    swapCourtPlayers(
+      swapSource.team,
+      swapSource.slotIndex,
+      target.team,
+      target.slotIndex,
+    );
+    setSwapSource(null);
+    setSelected(null);
+    toast.success(`Swapped ${sourceName} and ${targetName}`);
+  }
+
+  function handleStartSwap() {
+    if (!selected) return;
+    setSwapSource(selected);
+    setSelected(null);
+    toast.message(`Choose who swaps with ${getPlayerName(players, selected.playerId)}`);
   }
 
   return (
@@ -72,24 +114,40 @@ export function CourtSection() {
                   );
                 }
 
+                const courtPlayer = { team, slotIndex: index, playerId };
+                const isSwapSource =
+                  swapSource !== null && isSameCourtPlayer(swapSource, courtPlayer);
+                const playerName = getPlayerName(players, playerId);
+
                 return (
                   <PlayerRow
                     actions={
                       <Button
-                        aria-label={`Edit ${getPlayerName(players, playerId)}`}
-                        className="min-h-9 px-3"
-                        onClick={() =>
-                          setSelected({ team, slotIndex: index, playerId })
+                        aria-label={
+                          swapSource
+                            ? isSwapSource
+                              ? `Cancel swapping ${playerName}`
+                              : `Swap ${getPlayerName(
+                                  players,
+                                  swapSource.playerId,
+                                )} with ${playerName}`
+                            : `Edit ${playerName}`
                         }
+                        className="min-h-9 px-3"
+                        icon={isSwapSource ? <X size={16} /> : undefined}
+                        onClick={() => handleCourtPlayerClick(courtPlayer)}
                         type="button"
-                        variant="ghost"
+                        variant={swapSource && !isSwapSource ? "primary" : "ghost"}
                       >
-                        Edit
+                        {swapSource ? (isSwapSource ? "Cancel" : "Swap") : "Edit"}
                       </Button>
                     }
+                    className={cn(
+                      isSwapSource && "border-court-accent bg-blue-50",
+                    )}
                     detail={`Slot ${index + 1}`}
                     key={playerId}
-                    name={getPlayerName(players, playerId)}
+                    name={playerName}
                     wins={getWins(getState, playerId)}
                   />
                 );
@@ -102,9 +160,16 @@ export function CourtSection() {
       {selected ? (
         <Modal
           footer={
-            <>
+            <div className="grid w-full gap-2 sm:grid-cols-3">
               <Button
-                className="flex-1"
+                icon={<ArrowLeftRight size={18} />}
+                onClick={handleStartSwap}
+                type="button"
+                variant="primary"
+              >
+                Swap
+              </Button>
+              <Button
                 icon={<UsersRound size={18} />}
                 onClick={handleMoveToQueue}
                 type="button"
@@ -112,7 +177,6 @@ export function CourtSection() {
                 Move to Queue
               </Button>
               <Button
-                className="flex-1"
                 icon={<LogOut size={18} />}
                 onClick={handleRest}
                 type="button"
@@ -120,7 +184,7 @@ export function CourtSection() {
               >
                 Rest / Out
               </Button>
-            </>
+            </div>
           }
           onClose={() => setSelected(null)}
           title={getPlayerName(players, selected.playerId)}

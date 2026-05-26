@@ -7,6 +7,7 @@ type PlayerRowProps = {
   detail?: ReactNode;
   actions?: ReactNode;
   muted?: boolean;
+  className?: string;
 };
 
 export function PlayerRow({
@@ -15,12 +16,14 @@ export function PlayerRow({
   detail,
   actions,
   muted = false,
+  className,
 }: PlayerRowProps) {
   return (
     <div
       className={cn(
         "flex min-h-14 items-center justify-between gap-3 rounded-md border border-slate-200 bg-white px-3 py-2",
         muted && "bg-slate-50 text-slate-500",
+        className,
       )}
     >
       <div className="min-w-0">

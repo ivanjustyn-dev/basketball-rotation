@@ -381,6 +381,34 @@ export function moveCourtPlayerToRest(
   return movePlayerToRest({ ...state, court }, playerId);
 }
 
+export function swapCourtPlayers(
+  state: AppState,
+  sourceTeam: TeamKey,
+  sourceSlotIndex: number,
+  targetTeam: TeamKey,
+  targetSlotIndex: number,
+) {
+  if (sourceTeam === targetTeam && sourceSlotIndex === targetSlotIndex) {
+    return state;
+  }
+
+  const sourcePlayerId = state.court[sourceTeam][sourceSlotIndex];
+  const targetPlayerId = state.court[targetTeam][targetSlotIndex];
+  if (!sourcePlayerId || !targetPlayerId) {
+    return state;
+  }
+
+  const court = {
+    teamA: [...state.court.teamA],
+    teamB: [...state.court.teamB],
+  };
+
+  court[sourceTeam][sourceSlotIndex] = targetPlayerId;
+  court[targetTeam][targetSlotIndex] = sourcePlayerId;
+
+  return { ...state, court };
+}
+
 export function returnRestingPlayerToQueue(state: AppState, playerId: PlayerId) {
   if (!state.restingPlayers.includes(playerId)) {
     return state;

@@ -16,6 +16,7 @@ import {
   renameRegisteredPlayer,
   returnRestingPlayerToQueue,
   startNewGameDay,
+  swapCourtPlayers,
   undoLastResult,
 } from "../lib/rotation";
 import type { AppState, PlayerId, TeamKey } from "../types";
@@ -38,6 +39,12 @@ type AppActions = {
   moveQueuePlayerToRest: (playerId: PlayerId) => void;
   moveCourtPlayerToQueue: (team: TeamKey, slotIndex: number) => void;
   moveCourtPlayerToRest: (team: TeamKey, slotIndex: number) => void;
+  swapCourtPlayers: (
+    sourceTeam: TeamKey,
+    sourceSlotIndex: number,
+    targetTeam: TeamKey,
+    targetSlotIndex: number,
+  ) => void;
   returnRestingPlayerToQueue: (playerId: PlayerId) => void;
 };
 
@@ -72,6 +79,16 @@ export const useAppStore = create<AppStore>()(
         set(moveCourtPlayerToQueue(get(), team, slotIndex)),
       moveCourtPlayerToRest: (team, slotIndex) =>
         set(moveCourtPlayerToRest(get(), team, slotIndex)),
+      swapCourtPlayers: (sourceTeam, sourceSlotIndex, targetTeam, targetSlotIndex) =>
+        set(
+          swapCourtPlayers(
+            get(),
+            sourceTeam,
+            sourceSlotIndex,
+            targetTeam,
+            targetSlotIndex,
+          ),
+        ),
       returnRestingPlayerToQueue: (playerId) =>
         set(returnRestingPlayerToQueue(get(), playerId)),
     }),

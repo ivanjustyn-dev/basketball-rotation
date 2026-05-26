@@ -62,4 +62,27 @@ describe("App", () => {
     expect(screen.getAllByText("Queue #3").length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Check In All" })).toBeDisabled();
   });
+
+  it("swaps two players already on the court", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: "Add" }));
+    await user.type(screen.getByLabelText("Player names"), "A\nB\nC\nD\nE\nF\nG\nH\nI\nJ");
+    await user.click(screen.getByRole("button", { name: "Add Players" }));
+    await user.click(screen.getByRole("button", { name: "Check In All" }));
+    await user.click(screen.getByRole("button", { name: "Fill Empty Slots" }));
+
+    await user.click(screen.getByRole("button", { name: "Edit A" }));
+    await user.click(screen.getByRole("button", { name: "Swap" }));
+    await user.click(screen.getByRole("button", { name: "Swap A with G" }));
+
+    const teamA = screen.getByRole("heading", { name: "Team A" }).closest("article")!;
+    const teamB = screen.getByRole("heading", { name: "Team B" }).closest("article")!;
+
+    expect(within(teamA).getByText("G")).toBeInTheDocument();
+    expect(within(teamA).queryByText("A")).not.toBeInTheDocument();
+    expect(within(teamB).getByText("A")).toBeInTheDocument();
+    expect(within(teamB).queryByText("G")).not.toBeInTheDocument();
+  });
 });
